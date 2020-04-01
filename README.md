@@ -117,3 +117,83 @@ b = as.numeric(model$coefficients[2])
 ```
 The timespan plot of the timespan of our regression:
 ![COVID-19 Cases over time](plots/cases_vs_date_log_model_timespan.png)
+
+Looks pretty linear ... let's run a regression model and make some predictions
+
+
+
+## 2.2 Predictions ... The whole world
+
+Function to predict cases based on our simple model. Since the model is based an logarithmic values <- reverse operation of the values using exp()
+```r
+predict <- function(day,a,b){
+  cases = a + b*day
+  return(cases)
+}
+
+
+predict_cases <- function(day,a,b) {
+  result = exp(predict(day,a,b))
+  return(result)
+}
+```
+Now we can easily set a day and predict cases based on our simple regression
+```r
+today = length(data_model$daynr)
+```
+
+Prediction of our model for today (31st of March as i'm writing this)
+```r
+predict_cases(today,a,b)
+```
+800,000 vs 780,000 ... not too bad ...
+
+Prediction of our model for tomorrow, prediction of our model for one week into the future and prediction of our model for two weeks into the future.
+```r
+predict_cases(today+1,a,b)
+# Prediction of our model for one week into the future
+predict_cases(today+7,a,b)
+# 1,69 Million cases 7th of April :/
+
+# Prediction of our model for two weeks into the future
+predict_cases(today+14,a,b)
+```
+
+Use ggplot2 to create a diagram of the cases development worldwide and a linear trend
+```r
+# Plot the model timespan
+dateMin = min(data_model$date)
+dateMax = max(data_model$date) + 7
+ggplot(data_model, aes(x=date,y=cases)) + 
+  geom_line(aes(y=cases),size=1.1,alpha=0.7,color="white") + 
+  geom_point(aes(y=cases),alpha=0.5,color="grey") + 
+  scale_y_log10(labels = scales::comma) + 
+  geom_smooth(method = lm, fullrange=TRUE, color="red") +
+  ggtitle(paste0("Worldwide COVID-19 ",subject," over Time")) + xlab("Date") + 
+  ylab("Number (log)")+
+  xlim(dateMin, dateMax) +
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=20,color="orange")) 
+  ```
+  ![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time.png)
+  
+  Plot for the same data but the whole time range
+  ```r
+  # Plot the whole date span
+ggplot(data_subset, aes(x=date,y=cases)) + 
+  geom_line(aes(y=cases),size=1.1,alpha=0.7,color="white") + 
+  geom_point(aes(y=cases),alpha=0.5,color="grey") + 
+  scale_y_log10(labels = scales::comma) + 
+  geom_smooth(method = loess, fullrange=TRUE, color="red") +
+  ggtitle(paste0("Worldwide COVID-19 ",subject)) + xlab("Date") + 
+  ylab("Number (log)")+
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=20,color="orange")) 
+  ```
+    ![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time2.png)
