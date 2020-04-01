@@ -197,4 +197,46 @@ ggplot(data_subset, aes(x=date,y=cases)) +
   theme(plot.title = element_text(size=20,color="orange")) 
   ```
   
-  ![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
+![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
+## 2.3 Predictions - Single Countries or Regions
+ 
+Now that we have all set we can use the above data frames to investigate single countries or groups of countries/regions.
+Let's start with the united states. We create a list of countries/regions (needle) and filter the data frame. We therefor ecreate a subset of the data frame data_subset_countries using only regions we defined in the needle vector. Now we can run the same operations as above to predict and plot the CVOID-19 spread for specific regions.
+
+```r
+# List of regions to investigate
+needle = c("US")
+
+# Subset by Country list
+data_subset_US = data_subset_countries[which(data_subset_countries$country %in% needle),]
+
+# first impressions
+plot(log(data_subset_US$cases) ~ data_subset_US$date)
+# exponential growth since beginning of march 
+data_model_US <- data_subset_US[data_subset_US$date >= lastDay-14,]
+plot(log(data_model_US$cases) ~ data_model_US$date)
+
+# create Day Nr
+data_model_US$daynr = seq(1,length(data_model_US$cases))
+# logarithmize
+data_model_US$casesLog = log(data_model_US$cases)
+```
+![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
+![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
+
+Run the regression the same as before:
+```r
+# Regression
+model_US <- lm(data_model_US$casesLog ~ data_model_US$daynr)
+# extrahieren der Koeffizienten
+a = as.numeric(model_US$coefficients[1])
+b = as.numeric(model_US$coefficients[2])
+
+today = length(data_model_US$daynr)
+
+# Prediction of our model for today, tomorrow, etc (31st of March as i'm writing this)
+predict_cases(today,a,b)
+predict_cases(today+1,a,b)
+predict_cases(today+7,a,b)
+predict_cases(today+14,a,b)
+```
