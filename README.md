@@ -69,3 +69,46 @@ data_transformed$date <- as.Date(data_transformed$date, "%m.%d.%Y")
 # This is optional, save the new formatted data frame
 write.csv(data_transformed,paste0("covid_19_data_",subject,"_confirmed.csv"),row.names=FALSE)
 ```
+## 2. ANALYTICS
+### 2.1 World wide Trend
+
+
+Aggregate all cases by date -> overall sum over all countries for on date
+Aggregated Cases by Date and by Country
+```r
+data_subset <- aggregate(cases ~ date , data = data_transformed, sum)
+data_subset_countries <- aggregate(cases ~ country + date , data = data_transformed, sum)
+```
+
+First Impressions -> Plot
+We see a strong exponential development from mid of march ...
+logarithmize the cases to linearize exponential growth
+```r
+plot(data_subset$cases ~ data_subset$date)
+plot(log(data_subset$cases) ~ data_subset$date)
+```
+
+In order to make predictions we will simplify the model and use a simple linear regression model for the timespan the cases grow exponentially. Use the last two weeks for model building.
+
+```r
+lastDay <- max(data_subset$date)
+# let's use the last two weeks ... 
+data_model <- data_subset[data_subset$date >= lastDay-14,]
+# check plot ...
+plot(log(data_model$cases) ~ data_model$date)
+
+# To understand the regression, it's better to use Day Numbers
+# so we can ask later on, what will today plus 7 days look like?
+data_model$daynr = seq(1,length(data_model$cases))
+# logarithmize the cases to apply linear regression
+data_model$casesLog = log(data_model$cases)
+
+# Check the plot ... looks "linear" ?
+plot(data_model$casesLog ~ data_model$date)
+
+# Run a simple linear regression
+model <- lm(data_model$casesLog ~ data_model$daynr)
+# extract Coefficients
+a = as.numeric(model$coefficients[1])
+b = as.numeric(model$coefficients[2])
+```
