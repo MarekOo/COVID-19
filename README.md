@@ -196,4 +196,5 @@ ggplot(data_subset, aes(x=date,y=cases)) +
   theme(axis.text.y = element_text(size = 12)) +
   theme(plot.title = element_text(size=20,color="orange")) 
   ```
-    ![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time2.png)
+  
+  ![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
