@@ -87,6 +87,9 @@ logarithmize the cases to linearize exponential growth
 plot(data_subset$cases ~ data_subset$date)
 plot(log(data_subset$cases) ~ data_subset$date)
 ```
+![COVID-19 Cases over time](plots/cases_vs_date_simple.png)
+![COVID-19 Cases over time](plots/cases_vs_date_log_simple.png)
+
 
 In order to make predictions we will simplify the model and use a simple linear regression model for the timespan the cases grow exponentially. Use the last two weeks for model building.
 
@@ -112,3 +115,5 @@ model <- lm(data_model$casesLog ~ data_model$daynr)
 a = as.numeric(model$coefficients[1])
 b = as.numeric(model$coefficients[2])
 ```
+The timespan plot of the timespan of our regression:
+![COVID-19 Cases over time](plots/cases_vs_date_log_model_timespan.png)
