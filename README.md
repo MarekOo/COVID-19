@@ -41,3 +41,31 @@ data$Long <- NULL
 # check the data frame
 str(data)
 ```
+Structure should look like this:
+```r
+'data.frame':	256 obs. of  72 variables:
+ $ Province.State: chr  "" "" "" "" ...
+ $ Country.Region: chr  "Afghanistan" "Albania" "Algeria" "Andorra" ...
+ $ X1.22.20      : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ X1.23.20      : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ X1.24.20      : int  0 0 0 0 0 0 0 0 0 0 ...
+```
+We need to change the format of the data frame, from wide (columns) to long meaning we want a "date" and a "cases" variable instead of multiple columns for each date. This is calles transpose. This is necesary to make use of the data for later functions and plotting.
+What we want is this, the long format:
+```r
+$ region
+$ date
+$ cases
+```
+Using the melt function to transpose the data frame (needs prior transformation to data table format). furthermore, change the variable names to something more "speaking" and remove the X invoked by R (no variable names beginning with a number allowed). Optional, save the new formated data frame for later use ...
+```r
+data_transformed <- melt(as.data.table(data), id=c("Province.State","Country.Region"), fun="Sum")
+# change the variable names to something more "speaking"
+names(data_transformed) <-  c("region","country","date","cases")
+# remove the X invoked by R (no variable names beginning with a number allowed)
+data_transformed$date <- gsub("X", "0", paste(data_transformed$date))
+# transform character dates to actual date format
+data_transformed$date <- as.Date(data_transformed$date, "%m.%d.%Y")
+# This is optional, save the new formatted data frame
+write.csv(data_transformed,paste0("covid_19_data_",subject,"_confirmed.csv"),row.names=FALSE)
+```
