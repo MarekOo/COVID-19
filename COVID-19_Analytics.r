@@ -21,7 +21,7 @@ library(ggdark)
 ###################################################################################################
 
 # Define Working Directory
-setwd("~/Documents/uni/research")
+setwd("~/yourpathhere")
 
 subject = "Cases" # or "Deaths" or "Recovered Cases"
 
