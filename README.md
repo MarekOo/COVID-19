@@ -274,4 +274,4 @@ ggplot(data_subset_US, aes(x=date,y=cases)) +
 ```
 
 ![COVID-19 Cases over time](plots/US_covid19_cases_log.png)
-![COVID-19 Cases over time](plots/total_US_covid19_cases_log.png)
+![COVID-19 Cases over time](plots/total_US_covid-19_cases_log.png)
