@@ -21,7 +21,7 @@ library(ggdark)
 ###################################################################################################
 
 # Define Working Directory
-setwd("~/yourpathhere")
+setwd("~/yourdirectoryhere")
 
 subject = "Cases" # or "Deaths" or "Recovered Cases"
 
@@ -210,7 +210,7 @@ dateMax = max(data_model_US$date) + 7
 ggplot(data_model_US, aes(x=date,y=cases)) + 
   geom_line(aes(y=cases),size=1.1,alpha=0.7,color="white") + 
   geom_point(aes(y=cases),alpha=0.5,color="grey") + 
-  scale_y_log10(labels = scales::comma, breaks = c(50000,100000,500000,1000000), limits=c(50,1000000)) + 
+  scale_y_log10(labels = scales::comma) + 
   geom_smooth(method = lm, fullrange=TRUE, color="red") +
   ggtitle(paste0("US COVID-19 ",subject," over Time")) + xlab("Date") + 
   ylab("Number (log)")+
@@ -270,9 +270,7 @@ data_subset_top6 = data_subset_countries[which(data_subset_countries$country %in
 ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) + 
   geom_line(aes(y=cases),size=1.1,alpha=0.7) + 
   geom_point(aes(y=cases),alpha=0.5) + 
-  #scale_y_log10(labels = scales::comma, breaks = c(50000,100000,500000,1000000), limits=c(50,1000000)) + 
-  #geom_smooth(method = lm, fullrange=TRUE, color="red") +
-  ggtitle(paste0("US COVID-19 ",subject," over Time")) + xlab("Date") + 
+  ggtitle(paste0("COVID-19 ",subject," over Time")) + xlab("Date") + 
   ylab("Number (log)")+
   scale_color_nejm() + 
   dark_theme_gray() +
