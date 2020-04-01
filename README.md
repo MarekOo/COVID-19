@@ -221,8 +221,7 @@ data_model_US$daynr = seq(1,length(data_model_US$cases))
 # logarithmize
 data_model_US$casesLog = log(data_model_US$cases)
 ```
-![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
-![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
+
 
 Run the regression the same as before:
 ```r
@@ -240,3 +239,39 @@ predict_cases(today+1,a,b)
 predict_cases(today+7,a,b)
 predict_cases(today+14,a,b)
 ```
+And use ggplot to create a plot of the covid-19 spread
+```r
+# Plot the model timespan
+dateMin = min(data_model_US$date)
+dateMax = max(data_model_US$date) + 7
+ggplot(data_model_US, aes(x=date,y=cases)) + 
+  geom_line(aes(y=cases),size=1.1,alpha=0.7,color="white") + 
+  geom_point(aes(y=cases),alpha=0.5,color="grey") + 
+  scale_y_log10(labels = scales::comma) + 
+  geom_smooth(method = lm, fullrange=TRUE, color="red") +
+  ggtitle(paste0("US COVID-19 ",subject," over Time")) + xlab("Date") + 
+  ylab("Number (log)")+
+  xlim(dateMin, dateMax) +
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=20,color="orange")) 
+
+# Plot the whole date span
+ggplot(data_subset_US, aes(x=date,y=cases)) + 
+  geom_line(aes(y=cases),size=1.1,alpha=0.7,color="white") + 
+  geom_point(aes(y=cases),alpha=0.5,color="grey") + 
+  scale_y_log10(labels = scales::comma) + 
+  geom_smooth(method = loess, fullrange=TRUE, se=FALSE, color="red") +
+  ggtitle(paste0("US COVID-19 ",subject)) + xlab("Date") + 
+  ylab("Number (log)")+
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=20,color="orange")) 
+```
+
+![COVID-19 Cases over time](plots/US_covid19_cases_log.png)
+![COVID-19 Cases over time](plots/total_US_covid19_cases_log.png)
