@@ -353,7 +353,7 @@ ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) +
 
 ## 3. Plot outbreak on a map
 This is what we want:
-![COVID-19 Cases over time](plots/corona_world_map)
+![COVID-19 Cases over time](plots/corona_world_map.png)
 ### 3.1 Corona Infection World Map
 We use the map package to load map data 
 ```r
