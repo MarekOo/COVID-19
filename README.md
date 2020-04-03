@@ -401,6 +401,6 @@ Filter the corona data frame by a specific date, lets say 30th of march (days[69
   plot(plotWorldMap)
 ```
 Voila:
-![COVID-19 Cases over time](plots/corona_world_map)
+![COVID-19 Cases over time](plots/corona_world_map.png)
 
 ### 3.2 Corona Infection US Map
