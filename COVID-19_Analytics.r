@@ -191,7 +191,7 @@ data_model_US$casesLog = log(data_model_US$cases)
 
 # Regression
 model_US <- lm(data_model_US$casesLog ~ data_model_US$daynr)
-# extrahieren der Koeffizienten
+# extract coefficients
 a = as.numeric(model_US$coefficients[1])
 b = as.numeric(model_US$coefficients[2])
 
@@ -270,6 +270,7 @@ data_subset_top6 = data_subset_countries[which(data_subset_countries$country %in
 ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) + 
   geom_line(aes(y=cases),size=1.1,alpha=0.7) + 
   geom_point(aes(y=cases),alpha=0.5) + 
+  scale_y_log10(labels = scales::comma) + 
   ggtitle(paste0("COVID-19 ",subject," over Time")) + xlab("Date") + 
   ylab("Number (log)")+
   scale_color_nejm() + 
