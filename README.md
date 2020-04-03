@@ -356,7 +356,7 @@ ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) +
 ## 3. Plot outbreak on a map
 This is what we want:
 ![COVID-19 Cases over time](plots/corona_world_map.png)
-### 3.1 Corona Infection World Map
+### 3.1 Corona Infection World Map using ggplot and map
 We use the map package to load map data 
 ```r
   library(tidyr)
@@ -406,4 +406,48 @@ Filter the corona data frame by a specific date, lets say 30th of march (days[69
 Voila:
 ![COVID-19 Cases over time](plots/corona_world_map.png)
 
-### 3.2 Corona Infection US Map
+### 3.2 Corona Infection US Map using ggplot and map
+
+To plot the US Map we need to load another dataset from CSSEGISandData 
+and another map. Otherwise the procedure is basically the same.
+
+This we will only use the "Province_State" Variable and exclude the rest.
+
+
+
+```r    
+  # Only US Staates?
+  usa_map <- map_data("state")
+  # check it out
+  ggplot(usa_map, aes(x = long, y = lat, group = group)) +
+    geom_polygon(fill="lightgray", colour = "white")
+  
+  data_us <- read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv")
+  exclude_vars <- names(data_us) %in% c("UID", "iso2", "iso3","code3","FIPS","Admin2","Country_Region","Lat","Long_","Combined_Key")
+  data_us <- data_us[!exclude_vars]
+  data_us$Province_State <- tolower(data_us$Province_State)
+  # transpose the table
+  data_us_transformed <- melt(as.data.table(data_us), id=c("Province_State"), fun="Sum")
+  # change the variable names to something more "speaking"
+  names(data_us_transformed) <-  c("region","date","cases")
+  # remove the X invoked by R (no variable names beginning with a number allowed)
+  data_us_transformed$date <- gsub("X", "0", paste(data_us_transformed$date))
+  # transform character dates to actual date format
+  data_us_transformed$date <- as.Date(data_us_transformed$date, "%m.%d.%Y")
+  
+  data_aggregated_us <- aggregate(cases ~ region + date, data = data_us_transformed, sum)
+  # pick a date
+  us_data_filtered_by_date <- data_aggregated_us[which(data_aggregated_us$date==day),c("region","cases")]
+  # filter US corona data
+  cases.exp.map_us <- left_join(us_data_filtered_by_date, usa_map, by = "region")
+  
+  #plot the map 
+  plotUSMap <- ggplot(cases.exp.map_us, aes(long, lat, group = group))+
+    geom_polygon(aes(fill = cases ), color = "white")+
+    scale_fill_viridis_c(option = "D",direction=-1)+
+    dark_theme_gray()+ 
+    ggtitle(paste0("COVID-19 Infections USA, Date: ",day))
+  plot(plotUSMap)
+```
+Result:
+![COVID-19 Cases over time](plots/corona_us_map.png)
