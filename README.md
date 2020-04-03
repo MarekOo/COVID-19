@@ -12,9 +12,9 @@ Outline:
 1. Data Preparation
 
 2. Analytics
-  1. Worldwide trend of corona infections
-  2. Predictions of worldwide corona infections
-  3. Predictions - Single Countries or Regions
+  2.1. Worldwide trend of corona infections
+  2.2. Predictions of worldwide corona infections
+  2.3. Predictions - Single Countries or Regions
 
 3. Plot outbreak on a map
   1. Corona Infection World Map
