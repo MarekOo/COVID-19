@@ -13,7 +13,6 @@
   require(maps)
   require(viridis)
   library(ggpubr)
-  library(stringr)
   theme_set(
     theme_void()
   )

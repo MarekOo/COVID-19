@@ -8,6 +8,19 @@ Th script runs without any changes needed, just install the referenced R librari
 
 In order to easily model the whole thing, the data is logarithmized so that we can then use a simple linear regression. Building on this, we can then make forecasts for the next few days.
 
+Outline:
+1. Data Preparation
+
+2. Analytics
+2.1 Worldwide trend of corona infections
+2.2 Predictions of worldwide corona infections
+2.3 Predictions - Single Countries or Regions
+
+3. Plot outbreak on a map
+3.1 Corona Infection World Map
+3.2 Corona Infection US Map
+
+
 Data used: https://raw.githubusercontent.com/CSSEGISandData/COVID-19
 
 Libraries used:
@@ -128,7 +141,7 @@ Looks pretty linear ... let's run a regression model and make some predictions
 
 
 
-## 2.2 Predictions of infections ... The whole world
+### 2.2 Predictions of infections ... The whole world
 
 Function to predict cases based on our simple model. Since the model is based an logarithmic values <- reverse operation of the values using exp()
 ```r
@@ -204,7 +217,7 @@ ggplot(data_subset, aes(x=date,y=cases)) +
   ```
   
 ![COVID-19 Cases over time](plots/worldwide_covid-19_cases_over_time_2.png)
-## 2.3 Predictions - Single Countries or Regions
+### 2.3 Predictions - Single Countries or Regions
  
 Now that we have all set we can use the above data frames to investigate single countries or groups of countries/regions.
 Let's start with the united states. We create a list of countries/regions (needle) and filter the data frame. We therefor ecreate a subset of the data frame data_subset_countries using only regions we defined in the needle vector. Now we can run the same operations as above to predict and plot the CVOID-19 spread for specific regions.
@@ -337,3 +350,57 @@ ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) +
 ```
 ![COVID-19 Cases over time](plots/covid_cases_group_log.png)
 ![COVID-19 Cases over time](plots/covid_cases_group.png)
+
+## 3. Plot outbreak on a map
+This is what we want:
+![COVID-19 Cases over time](plots/corona_world_map)
+### 3.1 Corona Infection World Map
+We use the map package to load map data 
+```r
+  library(tidyr)
+  library(data.table)
+  library(ggplot2)
+  require(scales)
+  library(ggsci)
+  library(ggdark)
+  library(dplyr)
+  require(maps)
+  require(viridis)
+  library(ggpubr)
+  
+  #Load the World Map from the maps package
+  world_map <- map_data("world")
+  # check it out
+  ggplot(world_map, aes(x = long, y = lat, group = group)) +
+    geom_polygon(fill="lightgray", colour = "white")
+```
+unfortunately the CSSEGISandData dataset contains some non-standard names for countries. These have to be fixed manually :/
+```r
+  # unfortunately the CSSEGISandData dataset contains some non-standard names for countries. These have to be fixed manually :/
+  data_aggregated$region[which(data_aggregated$region=="US")] = "USA"
+  data_aggregated$region[which(data_aggregated$region=="Taiwan*")] = "Taiwan"
+  
+  # sort by date
+  days = sort(unique(data_aggregated$date))
+```  
+Plotting corona data on a world map.
+Filter the corona data frame by a specific date, lets say 30th of march (days[69]). Use this data to join with the map data. we need to join (left_join) the two datasets corona and the world map together by the country/region name. Plot the map using ggplot polygon, colored by the number of cases using "scale_fill_viridis_c" colors.
+
+```r  
+  # filter the corona data frame by a specific date, lets say 30th of march
+  day = days[69]
+  data_filtered_by_date <- data_aggregated[which(data_aggregated$date==day),c("region","cases")]
+  # Now we need to join the two datasets corona and the world map together by the country name
+  cases.exp.map <- left_join(data_filtered_by_date, world_map, by = "region")
+  # Plot the map using ggplot polygon, colored by the number of cases using scale_fill_viridis_c colors
+  plotWorldMap <- ggplot(cases.exp.map, aes(long, lat, group = group))+
+    geom_polygon(aes(fill = cases ), color = "white")+
+    scale_fill_viridis_c(option = "A",direction=-1)+
+    dark_theme_gray()+ 
+    ggtitle(paste0("COVID-19 Infections, Date: ",day))
+  plot(plotWorldMap)
+```
+Voila:
+![COVID-19 Cases over time](plots/corona_world_map)
+
+### 3.2 Corona Infection US Map
