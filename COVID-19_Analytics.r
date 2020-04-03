@@ -267,6 +267,7 @@ needle = c("China","US","Italy","Germany","Spain","Iran")
 
 # Subset by Country list
 data_subset_top6 = data_subset_countries[which(data_subset_countries$country %in% needle),]
+# Plot - log scales
 ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) + 
   geom_line(aes(y=cases),size=1.1,alpha=0.7) + 
   geom_point(aes(y=cases),alpha=0.5) + 
@@ -278,6 +279,16 @@ ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) +
   theme(axis.text.x = element_text(size = 15)) +
   theme(axis.text.y = element_text(size = 12)) +
   theme(plot.title = element_text(size=20,color="orange")) 
-
+# Plot - normal scales
+ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) + 
+  geom_line(aes(y=cases),size=1.1,alpha=0.7) + 
+  geom_point(aes(y=cases),alpha=0.5) + 
+  ggtitle(paste0("COVID-19 ",subject," over Time")) + xlab("Date") + 
+  ylab("Number (log)")+
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=20,color="orange")) 
 
 #############################################################################################
