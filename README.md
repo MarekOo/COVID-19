@@ -318,7 +318,9 @@ ggplot(data_subset_US, aes(x=date,y=newInfects,colour=country)) +
 ```
 ![COVID-19 Cases over time](plots/daily_cases_US.png)
 
-To investigate a set of regions/countries just change the list "needle" and plot the group using ggplot. Usually log scales give a better pricture so scale the y axis with scale_y_log10.
+To investigate a set of regions/countries just change the list "needle" 
+and plot the group using ggplot. Usually log scales give a better pricture 
+so scale the y axis with scale_y_log10.
 ```r
 needle = c("China","US","Italy","Germany","Spain","Iran")
 
@@ -374,7 +376,8 @@ We use the map package to load map data
   ggplot(world_map, aes(x = long, y = lat, group = group)) +
     geom_polygon(fill="lightgray", colour = "white")
 ```
-unfortunately the CSSEGISandData dataset contains some non-standard names for countries. These have to be fixed manually :/
+unfortunately the CSSEGISandData dataset contains some non-standard names for countries. 
+These have to be fixed manually :/
 ```r
   # unfortunately the CSSEGISandData dataset contains some non-standard names for countries. These have to be fixed manually :/
   data_aggregated$region[which(data_aggregated$region=="US")] = "USA"
