@@ -2,7 +2,13 @@
 ![COVID-19 Cases over time](plots/corona_analytics.png)
 
 ## Goal
-The overall goal is to model the COVID-19 spread in order to understand the spread and make (simple) predictions about the future trend of the pandemic. In order to easily model the whole thing, the data is logarithmized so that we can then use a simple linear regression. Building on this, we can then make forecasts for the next few days.
+The overall goal is to model the COVID-19 spread in order to understand the spread and make (simple) predictions about the future trend of the pandemic. 
+
+Th script runs without any changes needed, just install the referenced R libraries and hut run.
+
+In order to easily model the whole thing, the data is logarithmized so that we can then use a simple linear regression. Building on this, we can then make forecasts for the next few days.
+
+Data used: https://raw.githubusercontent.com/CSSEGISandData/COVID-19
 
 Libraries used:
 ```r
@@ -41,7 +47,7 @@ data$Long <- NULL
 # check the data frame
 str(data)
 ```
-Structure should look like this:
+Structure of the data frame will look like this:
 ```r
 'data.frame':	256 obs. of  72 variables:
  $ Province.State: chr  "" "" "" "" ...
@@ -50,7 +56,7 @@ Structure should look like this:
  $ X1.23.20      : int  0 0 0 0 0 0 0 0 0 0 ...
  $ X1.24.20      : int  0 0 0 0 0 0 0 0 0 0 ...
 ```
-We need to change the format of the data frame, from wide (columns) to long meaning we want a "date" and a "cases" variable instead of multiple columns for each date. This is calles transpose. This is necesary to make use of the data for later functions and plotting.
+We need to change the format of the data frame, from wide (columns) to long meaning we want a "date" and a "cases" variable instead of multiple columns for each date. This is calles transpose. This is necesary to make use of the data for later functions and plotting. 
 What we want is this, the long format:
 ```r
 $ region
@@ -70,7 +76,7 @@ data_transformed$date <- as.Date(data_transformed$date, "%m.%d.%Y")
 write.csv(data_transformed,paste0("covid_19_data_",subject,"_confirmed.csv"),row.names=FALSE)
 ```
 ## 2. ANALYTICS
-### 2.1 World wide Trend
+### 2.1 World wide trend of infections with corona
 
 
 Aggregate all cases by date -> overall sum over all countries for on date
@@ -122,7 +128,7 @@ Looks pretty linear ... let's run a regression model and make some predictions
 
 
 
-## 2.2 Predictions ... The whole world
+## 2.2 Predictions of infections ... The whole world
 
 Function to predict cases based on our simple model. Since the model is based an logarithmic values <- reverse operation of the values using exp()
 ```r
@@ -275,3 +281,59 @@ ggplot(data_subset_US, aes(x=date,y=cases)) +
 
 ![COVID-19 Cases over time](plots/US_covid19_cases_log.png)
 ![COVID-19 Cases over time](plots/total_US_covid-19_cases_log.png)
+
+What About the daily increase/change?
+Lazy Approach: Calculate the daily cases based on the subtraction of today and yesterday
+Keep in mind, this only Works only for single regions due to the structure of our data frame. It will fail if you have groups. There is another way, check out the Daily-Change script.
+
+```r
+yesterday = c(data_subset_US$cases[1],data_subset_US$cases[1:length(data_subset_US$cases)-1])
+data_subset_US$newInfects = data_subset_US$cases - yesterday
+
+ggplot(data_subset_US, aes(x=date,y=newInfects,colour=country)) + 
+  geom_line(aes(y=newInfects),size=1.1,alpha=0.7) + 
+  geom_point(aes(y=newInfects),alpha=0.5) + 
+  geom_smooth(method = loess, aes(color=country),color="white") +
+  ggtitle(paste0("Daily COVID-19 ",subject," in the US")) + xlab("Date") + 
+  ylab("Daily Increase")+
+  xlim(dateMin, dateMax) +
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=30,color="orange")) 
+```
+![COVID-19 Cases over time](plots/daily_cases_US.png)
+
+To investigate a set of regions/countries just change the list "needle" and plot the group using ggplot. Usually log scales give a better pricture so scale the y axis with scale_y_log10.
+```r
+needle = c("China","US","Italy","Germany","Spain","Iran")
+
+# Subset by Country list
+data_subset_top6 = data_subset_countries[which(data_subset_countries$country %in% needle),]
+# Plot - log scales
+ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) + 
+  geom_line(aes(y=cases),size=1.1,alpha=0.7) + 
+  geom_point(aes(y=cases),alpha=0.5) + 
+  scale_y_log10(labels = scales::comma) + 
+  ggtitle(paste0("COVID-19 ",subject," over Time")) + xlab("Date") + 
+  ylab("Number (log)")+
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=20,color="orange")) 
+# Plot - normal scales
+ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) + 
+  geom_line(aes(y=cases),size=1.1,alpha=0.7) + 
+  geom_point(aes(y=cases),alpha=0.5) + 
+  ggtitle(paste0("COVID-19 ",subject," over Time")) + xlab("Date") + 
+  ylab("Number (log)")+
+  scale_color_nejm() + 
+  dark_theme_gray() +
+  theme(axis.text.x = element_text(size = 15)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=20,color="orange")) 
+```
+![COVID-19 Cases over time](plots/covid_cases_group_log.png)
+![COVID-19 Cases over time](plots/covid_cases_group.png)
