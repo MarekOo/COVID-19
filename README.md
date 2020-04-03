@@ -41,7 +41,7 @@ if (subject=="Cases") {
 data$Province.State = as.character(data$Province.State)
 data$Country.Region = as.character(data$Country.Region)
 
-#We can remove lat and long since we are not using this geo information here
+#We can remove "lat" and "long" since we are not using this geo information here. You could use this to plot dots over map sized by the number of infections. I do not consider this a very usefull way to vizualize this kind of data. We can plot a World map and color the Countries/regions relative to the outbreak instensity, check out the "World Map" Script.
 data$Lat <-  NULL
 data$Long <- NULL
 # check the data frame
