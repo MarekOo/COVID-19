@@ -12,13 +12,13 @@ Outline:
 1. Data Preparation
 
 2. Analytics
-2.1 Worldwide trend of corona infections
-2.2 Predictions of worldwide corona infections
-2.3 Predictions - Single Countries or Regions
+⋅⋅1. Worldwide trend of corona infections
+⋅⋅2. Predictions of worldwide corona infections
+⋅⋅3. Predictions - Single Countries or Regions
 
 3. Plot outbreak on a map
-3.1 Corona Infection World Map
-3.2 Corona Infection US Map
+⋅⋅1. Corona Infection World Map
+⋅⋅2. Corona Infection US Map
 
 
 Data used: https://raw.githubusercontent.com/CSSEGISandData/COVID-19
