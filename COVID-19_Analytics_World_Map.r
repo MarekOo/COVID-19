@@ -148,3 +148,37 @@
   system(paste0("ffmpeg -y -framerate 3 -i ",outputDir,"covid19_",subject,"_day_%04d.png -c:v libx264 -r 30 -pix_fmt yuv420p ",outputDir,"covid19_",subject,"_day_",vidDate,".mp4"))
   # gif animation with convert from imagemagick
   system(paste0("convert -delay 10 -loop 0 ",outputDir,"covid19_",subject,"*.png ",outputDir,"covid19_",subject,"_day_",vidDate,".gif"))
+
+  ################################################################################################
+  # US Map
+  ################################################################################################
+  outputDir = "animation/"
+  # Set the max for the y Variable to keep legend in plot stable
+  ymaxTotal <- max(data_aggregated_us$cases)
+
+  for (i in 1:length(days)) {
+    day = days[i]
+    number = str_pad(i, 4, pad = "0")
+    print(number)
+    
+    us_data_filtered_by_date <- data_aggregated_us[which(data_aggregated_us$date==day),c("region","cases")]
+    # filter US corona data
+    cases.exp.map_us <- left_join(us_data_filtered_by_date, usa_map, by = "region")
+  
+    #plot the map 
+    png(file = paste0(outputDir,"us_covid19_cases_day_",number,".png"), bg = "white",width = 1280,height=768,pointsize = 12)
+    plotUSMap <- ggplot(cases.exp.map_us, aes(long, lat, group = group))+
+      geom_polygon(aes(fill = cases ), color = "white")+
+      scale_fill_viridis_c(option = "D",direction=-1,limits=c(0,ymaxTotal))+
+      dark_theme_gray()+ 
+      ggtitle(paste0("COVID-19 Infections USA, Date: ",day))
+    plot(plotUSMap)
+    dev.off()
+  }
+  
+  vidDate = max(data_aggregated_us$date)
+  # video with ffmpeg
+  system(paste0("ffmpeg -y -framerate 3 -i ",outputDir,"us_covid19_cases_day_%04d.png -c:v libx264 -r 30 -pix_fmt yuv420p ",outputDir,"us_covid19_day_",vidDate,".mp4"))
+  # gif animation with convert from imagemagick
+  system(paste0("convert -delay 10 -loop 0 ",outputDir,"us_covid19_cases*.png ",outputDir,"us_covid19_day_",vidDate,".gif"))
+  

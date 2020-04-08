@@ -19,7 +19,10 @@ Outline:
 3. Plot outbreak on a map
    - Corona Infection World Map
    - Corona Infection US Map
-
+   
+4. Animate the outbreak on a map
+   - Corona Infection World Map Animation
+   - Corona Infection US Map Animation
 
 Data used: https://raw.githubusercontent.com/CSSEGISandData/COVID-19
 
@@ -452,5 +455,78 @@ This we will only use the "Province_State" Variable and exclude the rest.
 Result:
 ![COVID-19 Cases over time](plots/corona_us_map.png)
 
-Now we want to use the above technique and create a animation of the COVID-19 Spread using a fro loop to create PNG files of every time frame and use ffmpeg or convert to create an animation.
+## 4. Animate the outbreak on a map
+### 4.1 Corona Infection World Map Animation
 
+Now we want to use the above technique and create a animation of the COVID-19 Spread using a for loop to create PNG files of every time frame and use ffmpeg 8mp4) or convert (GIF - ImageMagick) to create an animation.
+```r 
+ # use this folder for image output -> don't forget to set working directory!
+  outputDir = "animation/"
+  # Set the max for the y Variable to keep legend in plot stable
+  ymaxTotal <- max(data_aggregated$cases)
+  
+  for (i in 1:length(days)) {
+    day = days[i]
+    number = str_pad(i, 4, pad = "0")
+    print(number)
+    data_filtered_by_date <- data_aggregated[which(data_aggregated$date==day),c("region","cases")]
+    # Now we need to join the two datasets corona and the world map together by the country name
+    cases.exp.map <- left_join(data_filtered_by_date, world_map, by = "region")
+    # Plot the map using ggplot polygon, colored by the number of cases using scale_fill_viridis_c colors
+    png(file = paste0(outputDir,"covid19_",subject,"_day_",number,".png"), bg = "white",width = 1280,height=768,pointsize = 12)
+    plotA <- ggplot(cases.exp.map, aes(long, lat, group = group))+
+      geom_polygon(aes(fill = cases ), color = "white")+
+      scale_fill_viridis_c(option = "A",direction=-1,limits=c(0,ymaxTotal))+
+      dark_theme_gray()+ 
+      ggtitle(paste0("COVID-19 daily Infections, Date: ",days[i]))
+    plot(plotA)
+    dev.off() 
+  }
+  
+  vidDate = max(data_aggregated$date)
+  # video with ffmpeg
+  system(paste0("ffmpeg -y -framerate 3 -i ",outputDir,"covid19_",subject,"_day_%04d.png -c:v libx264 -r 30 -pix_fmt yuv420p ",outputDir,"covid19_",subject,"_day_",vidDate,".mp4"))
+  # gif animation with convert from imagemagick
+  system(paste0("convert -delay 10 -loop 0 ",outputDir,"covid19_",subject,"*.png ",outputDir,"covid19_",subject,"_day_",vidDate,".gif"))
+```
+Result
+![COVID-19 Cases over time](animation/covid19_Deaths_day_20-04-07.gif)
+
+### 4.2 Corona Infection US Map Animation
+Use the same approach to animate the spread of infections for the US Map only.
+```r 
+  ################################################################################################
+  # US Map
+  ################################################################################################
+  outputDir = "animation/"
+  # Set the max for the y Variable to keep legend in plot stable
+  ymaxTotal <- max(data_aggregated_us$cases)
+
+  for (i in 1:length(days)) {
+    day = days[i]
+    number = str_pad(i, 4, pad = "0")
+    print(number)
+    
+    us_data_filtered_by_date <- data_aggregated_us[which(data_aggregated_us$date==day),c("region","cases")]
+    # filter US corona data
+    cases.exp.map_us <- left_join(us_data_filtered_by_date, usa_map, by = "region")
+  
+    #plot the map 
+    png(file = paste0(outputDir,"us_covid19_cases_day_",number,".png"), bg = "white",width = 1280,height=768,pointsize = 12)
+    plotUSMap <- ggplot(cases.exp.map_us, aes(long, lat, group = group))+
+      geom_polygon(aes(fill = cases ), color = "white")+
+      scale_fill_viridis_c(option = "D",direction=-1,limits=c(0,ymaxTotal))+
+      dark_theme_gray()+ 
+      ggtitle(paste0("COVID-19 Infections USA, Date: ",day))
+    plot(plotUSMap)
+    dev.off()
+  }
+  
+  vidDate = max(data_aggregated_us$date)
+  # video with ffmpeg
+  system(paste0("ffmpeg -y -framerate 3 -i ",outputDir,"us_covid19_cases_day_%04d.png -c:v libx264 -r 30 -pix_fmt yuv420p ",outputDir,"us_covid19_day_",vidDate,".mp4"))
+  # gif animation with convert from imagemagick
+  system(paste0("convert -delay 10 -loop 0 ",outputDir,"us_covid19_cases*.png ",outputDir,"us_covid19_day_",vidDate,".gif"))
+```
+Result
+![COVID-19 Cases over time](animation/us_covid19_day_20-04-07.gif)
