@@ -4,7 +4,7 @@
 ## Goal
 The overall goal is to model the COVID-19 spread in order to understand the spread and make (simple) predictions about the future trend of the pandemic. 
 
-Th script runs without any changes needed, just install the referenced R libraries and hut run.
+Th script runs without any changes needed, just install the referenced R libraries and hit run.
 
 In order to easily model the whole thing, the data is logarithmized so that we can then use a simple linear regression. Building on this, we can then make forecasts for the next few days.
 
