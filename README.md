@@ -356,7 +356,7 @@ ggplot(data_subset_top6, aes(x=date,y=cases,color=country)) +
 ## 3. Plot outbreak on a map
 This is what we want:
 ![COVID-19 Cases over time](plots/corona_world_map.png)
-### 3.1 Corona Infection World Map using ggplot and map
+### 3.1 Corona Infection World Map  using ggplot and map
 We use the map package to load map data 
 ```r
   library(tidyr)
@@ -451,3 +451,6 @@ This we will only use the "Province_State" Variable and exclude the rest.
 ```
 Result:
 ![COVID-19 Cases over time](plots/corona_us_map.png)
+
+Now we want to use the above technique and create a animation of the COVID-19 Spread using a fro loop to create PNG files of every time frame and use ffmpeg or convert to create an animation.
+

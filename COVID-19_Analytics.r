@@ -23,7 +23,7 @@ library(ggdark)
 # Define Working Directory
 setwd("~/yourdirectoryhere")
 
-subject = "Cases" # or "Deaths" or "Recovered Cases"
+subject = "Deaths" # or "Deaths" or "Recovered Cases"
 
 # Load the Dataset 
 if (subject=="Cases") {
@@ -81,7 +81,7 @@ plot(log(data_subset$cases) ~ data_subset$date)
 
 lastDay <- max(data_subset$date)
 # let's use the last two weeks ... 
-data_model <- data_subset[data_subset$date >= lastDay-14,]
+data_model <- data_subset[data_subset$date >= lastDay-21,]
 # check plot ...
 plot(log(data_model$cases) ~ data_model$date)
 
