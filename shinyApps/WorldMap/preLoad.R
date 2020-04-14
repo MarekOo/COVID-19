@@ -8,8 +8,8 @@ library(data.table)
 
 
 
-subjectList = c("Cases","Deaths","Recovered Cases")
-#setwd("~/ShinyApps/sample-apps/covid19_world_map")
+subjectList = c("Cases","Deaths","Recovered")
+#setwd("~/shinyApps/WorldMap")
 
 for (subject in subjectList) {
   # Load the Dataset 
@@ -49,7 +49,8 @@ for (subject in subjectList) {
   
 
   write.csv(data_aggregated,paste0("data_aggregated_",subject,".csv"))
-  save(data_aggregated,file = paste0("data_aggregated_",subject,".RData"))
+  assign(subject, data_aggregated)
+  save(list=c(subject),data_aggregated,file = paste0("data_aggregated_",subject,".RData"))
 }
 
 

@@ -17,25 +17,31 @@ theme_set(
 
 #subject = "Deaths"
 
-Cases <- read.csv(paste0("data_aggregated_Cases.csv"),row.names = NULL)
-Deaths <- read.csv(paste0("data_aggregated_Deaths.csv"),row.names = NULL)
-Recovered <- read.csv(paste0("data_aggregated_Recovered.csv"),row.names = NULL)
+#Cases <- read.csv(paste0("data_aggregated_Cases.csv"),row.names = NULL)
+#Deaths <- read.csv(paste0("data_aggregated_Deaths.csv"),row.names = NULL)
+#Recovered <- read.csv(paste0("data_aggregated_Recovered.csv"),row.names = NULL)
 
-Cases_2 <- Cases
-Cases_2$region <- as.character(Cases_2$region)
-Cases_2$date <- as.character(Cases_2$date)
-Cases_2$date <- as.Date(Cases_2$date, "%Y-%m-%d")
-Cases_2$X <- NULL
+#Cases
+load("data_aggregated_Cases.RData")
+#Deaths
+load("data_aggregated_Deaths.RData")
+#Recovered
+load("data_aggregated_Recovered.RData")
+
 
 #Load the World Map from the maps package
 world_map <- map_data("world")
 
 #setwd("~/ShinyApps/sample-apps/covid19_world_map")
-#Cases <- read.csv(paste0("data_aggregated_Cases.csv"),row.names = NULL)
-allDates <- as.Date(Cases$date, "%m.%d.%y")
+
+allDates <- Cases$date
 allCountries <- sort(unique(Cases$region))
 days = sort(unique(allDates))
 maxDays = length(days)
+start = "2020-01-22"
+#this is super weird ... 
+end = paste0("20",format(max(allDates),"%Y-%m-%d"))
+print(end)
 # Define UI for app that draws a histogram ----
 
 ###########################################################################################
@@ -72,11 +78,12 @@ ui <- fluidPage(
            selectInput(inputId = "countries",
                        label = "Countries",
                        multiple = TRUE,
-                       choices = allCountries),
+                       choices = allCountries,
+                       selected = c("USA","Germany","China")),
            dateRangeInput("daterange1", "Date range:",
-                          start = min(days),
-                          end   = max(days),
-                          format = "yy-mm-dd")
+                          start = start,
+                          end   = end,
+                          format = "yyyy-mm-dd")
            ),
     column(6,
            plotOutput(outputId = "plotB")
@@ -104,27 +111,9 @@ ui <- fluidPage(
 
 ###########################################################################################
 ###########################################################################################
-# Define server logic required to draw a histogram ----
+
 server <- function(input, output) {
-  
-  # Histogram of the Old Faithful Geyser Data ----
-  # with requested number of bins
-  # This expression that generates a histogram is wrapped in a call
-  # to renderPlot to indicate that:
-  #
-  # 1. It is "reactive" and therefore should be automatically
-  #    re-executed when inputs (input$bins) change
-  # 2. Its output type is a plot
-  #subject <- reactive({
-  #  switch(input$subject,
-  #         "Cases" = Cases,
-  #         "Deaths" = Deaths,
-  #         "Recovered" = Recovered)
-  #})
-  
-  
-  
-  
+
   output$plotA <- renderPlot({
     
     if(input$subject == "Cases"){
@@ -137,14 +126,6 @@ server <- function(input, output) {
       data_aggregated <- Recovered
       subject = "Recovered Cases"
     }
-    
-    
-    data_aggregated$region <- as.character(data_aggregated$region)
-    data_aggregated$date <- as.character(data_aggregated$date)
-    data_aggregated$date <- as.Date(data_aggregated$date, "%Y-%m-%d")
-    data_aggregated$X <- NULL
-    # sort by date
-    #days = sort(unique(data_aggregated$date))
     
     # filter the corona data frame by a specific date, lets say 30th of march
     day = input$day
@@ -163,9 +144,13 @@ server <- function(input, output) {
   
   output$plotB <- renderPlot({
     needle = input$countries
-    
+    dateA <- format(as.Date(input$daterange1[1],"%Y-%m-%d"), "%y-%m-%d")
+    dateB <- format(as.Date(input$daterange1[2],"%Y-%m-%d"), "%y-%m-%d")
+    dateA <- as.Date(dateA)
+    dateB <- as.Date(dateB)
+
     # Subset by Country list
-    data_subset = Cases_2[which(Cases_2$region %in% needle),]
+    data_subset = Cases[which(Cases$region %in% needle),]
     # first impressions
     ggplot(data_subset, aes(x=date,y=cases,color=region)) + 
       geom_line(aes(y=cases),size=1.1,alpha=0.7) + 
@@ -178,7 +163,7 @@ server <- function(input, output) {
       theme(axis.text.x = element_text(size = 15)) +
       theme(axis.text.y = element_text(size = 12)) +
       theme(plot.title = element_text(size=20,color="orange"))+
-      xlim(input$daterange1[1],input$daterange1[2])
+      xlim(dateA,dateB)
   })
   
   output$plotC <- renderPlot({
